@@ -2,7 +2,7 @@
 #Scenario 1: Constructing Gene Regulatory Network with mRNAs, TFs and miRNAs
 ## 1. Processing for miRTarbase 6.0 
 library("miRBaseConverter")
-load(url("https://xutaosheng.github.io/ExperimentData/miRBaseConverter/miRTarbase_hsa_6.rda"))
+load(url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/miRTarbase_hsa_6.rda"))
 miRNANames=miRTarbase_hsa_6$miRNA
 version=checkMiRNAVersion(miRNANames)
 ##version="miRBase v21"
@@ -10,7 +10,7 @@ Accessions=miRNA_NameToAccession(miRNANames,version = version)
 miRTarbase_hsa_6=cbind(Accessions,miRTarbase_hsa_6)
 
 ## 2. Processing for miRecords 4 
-load(url("https://xutaosheng.github.io/ExperimentData/miRBaseConverter/miRecords_v4.rda"))
+load(url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/miRecords_v4.rda"))
 index=which(miRecords_v4$`Target gene_species_scientific` =="Homo sapiens" 
             & miRecords_v4$miRNA_species=="Homo sapiens")
 miRecords_hsa_v4=miRecords_v4[index,]
@@ -33,7 +33,7 @@ index=which(is.na(miRecords_hsa_v4$Accession) | is.na(miRecords_hsa_v4$ENTREZID)
 miRecords_hsa_v4=miRecords_hsa_v4[-index,]
 
 ## 3. Processing for  transmir_v1.2
-load(url("https://xutaosheng.github.io/ExperimentData/miRBaseConverter/transmir_v1_2.rda"))
+load(url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/transmir_v1_2.rda"))
 index=which(transmir_v1_2$organism=="human")
 transmir_hsa_v1_2=transmir_v1_2[index,]
 miRNANames=transmir_hsa_v1_2$mir
@@ -51,7 +51,7 @@ index=which(is.na(transmir_hsa_v1_2$Accession))
 transmir_hsa_v1_2=transmir_hsa_v1_2[-index,]
 
 ## 4. Processing for ENCODE_TF_miRNA
-load(url("https://xutaosheng.github.io/ExperimentData/miRBaseConverter/ENCODE_TF_miRNA.rda"))
+load(url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/ENCODE_TF_miRNA.rda"))
 ##select the TF-miRNA interactions
 index=which(ENCODE_TF_miRNA$Interections=="(TF-miRNA)")
 ENCODE_TF_miRNA=ENCODE_TF_miRNA[index,]
@@ -78,7 +78,7 @@ ENCODE_TF_miRNA=cbind(geneSymbols,miRNANames)
 library("HGNChelper")
 library("org.Hs.eg.db")
 ##TRED
-load(url("https://xutaosheng.github.io/ExperimentData/miRBaseConverter/TRED.rda"))
+load(url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/TRED.rda"))
 TRED=unlist2(TRED)
 TRED=data.frame("TF_Symbol"=names(TRED),"targetGene_ENTREZID"=TRED,stringsAsFactors = FALSE)
 TF_Symbol=TRED$TF_Symbol
@@ -97,7 +97,7 @@ index=which(is.na(TRED$TF_ENTREZID))
 TRED=TRED[-index,]
 
 ##ENCODE Chip-seq
-load(url("https://xutaosheng.github.io/ExperimentData/miRBaseConverter/ENCODE_TF_mRNA.rda"))
+load(url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/ENCODE_TF_mRNA.rda"))
 ENCODE_TF_mRNA=unlist2(ENCODE_TF_mRNA)
 ENCODE_TF_mRNA=data.frame("TF_Symbol"=names(ENCODE_TF_mRNA),
                           "targetGene_ENTREZID"=ENCODE_TF_mRNA,stringsAsFactors = FALSE)
@@ -174,10 +174,10 @@ sum(network_matrix)
 save(network_matrix,all_molecules,file="network_matrix.rda")
 
 
-#Scenario 2: Predicting miRNA Targets from Integrated Sources
+#Scenario 2: Predicting miRNA Targets by Integrating Different Data Sources
 
 ##Convert the miRNA names for TCGA BRCA miRNA expression dataset
-load(url("https://xutaosheng.github.io/ExperimentData/miRBaseConverter/BRCA200.rda"))
+load(url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/BRCA200.rda"))
 miRNANames=colnames(BRCA_miRNA)
 version=checkMiRNAVersion(miRNANames)##miRBase version 16
 ####Convert the miRBase version 16 to version 21
@@ -200,7 +200,7 @@ write.csv(BRCA,file = "BRCA_412miR_8000mR.csv", row.names = FALSE)
 
 ## Process the miRNA Annotations of TargetScan7.0 and miRTabase 6
 TargetScan_7=read.csv(
-  url("https://xutaosheng.github.io/ExperimentData/miRBaseConverter/TargetScan_7.0.csv"),
+  url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/TargetScan_7.0.csv"),
                       as.is =TRUE)
 miRNANames=TargetScan_7$mir
 version=checkMiRNAVersion(miRNANames)  ##miRBase version 17
@@ -213,7 +213,7 @@ write.csv(TargetScan_7,file = "TargetScan7_miRv21.csv", row.names = FALSE)
 
 ####Extract the interactions from miRTarbase_6
 load(
-  url("https://xutaosheng.github.io/ExperimentData/miRBaseConverter/miRTarbase_hsa_6.rda"))
+  url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/miRTarbase_hsa_6.rda"))
 miRTarbase6=miRTarbase_hsa_6[,c(2,4)]
 write.csv(miRTarbase6,file = "miRTarbase6.csv", row.names = FALSE)
 
