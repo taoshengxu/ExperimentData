@@ -224,7 +224,6 @@ Pridict_targets=Pearson("./BRCA_412miR_8000mR.csv", c(1:412), c(413:8412)
 #Extract the hsa-miR-224-5p as the example
 miRTop100=bRank(Pridict_targets, 151,100, TRUE)
 
-
 ####Validate the prediction using miRTarBase 6.0
 miRTop100Confirmed = Validation(miRTop100, "miRTarbase6.csv")
 miRTop100Confirmed=miRTop100Confirmed[[1]]
@@ -238,5 +237,14 @@ miRTop100Confirmed=miRTop100Confirmed[[1]]
 ## hsa-miR-224-5p EYA4 -0.08509764
 ## hsa-miR-224-5p PTX3 0.25557907
 ## hsa-miR-224-5p EFNA3 0.22785473
+
+####Report the sequence of the miRNA of interest
+#Query the sequence of hsa-miR-224-5p and hsa-miR-224-3p
+Accessions=miRNA_NameToAccession(c("hsa-miR-224-5p","hsa-miR-224-3p"),version = "v21")
+getMiRNASequence(Accessions$Accession, targetVersion = "v21")
+##   Accession      miRNASequence_v21
+## 1 MIMAT0000281   CAAGUCACUAGUGGUUCCGUU
+## 2 MIMAT0009198   AAAAUGGUGCCCUAGUGACUACA
+
 
 
