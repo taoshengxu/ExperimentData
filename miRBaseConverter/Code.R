@@ -1,6 +1,7 @@
 
-#Scenario 1: Constructing Gene Regulatory Network with mRNAs, TFs and miRNAs
+#Case study 1: Constructing Gene Regulatory Network with mRNAs, TFs and miRNAs
 ## 1. Processing for miRTarbase 7.0 
+devtools::install_github("taoshengxu/miRBaseConverter")
 library("miRBaseConverter")
 load(url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/miRTarbase_hsa_7.rda"))
 miRNANames=miRTarbase_hsa_7$miRNA
@@ -117,8 +118,7 @@ index=which(is.na(ENCODE_TF_mRNA$TF_ENTREZID))
 ENCODE_TF_mRNA=ENCODE_TF_mRNA[-index,]
 
 
-##Case study 1. Constructing miRNA-TF-mRNA network based on the interaction databases
-
+## 6.Constructing miRNA-TF-mRNA network based on the interaction databases
 ####Extract all the regulation relationships from each of the interaction databases
 ########miRTarbase_hsa_7
 interaction1=cbind("regulatorID"=miRTarbase_hsa_7$Accession,
