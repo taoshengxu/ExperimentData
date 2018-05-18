@@ -1,13 +1,13 @@
 
 #Scenario 1: Constructing Gene Regulatory Network with mRNAs, TFs and miRNAs
-## 1. Processing for miRTarbase 6.0 
+## 1. Processing for miRTarbase 7.0 
 library("miRBaseConverter")
-load(url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/miRTarbase_hsa_6.rda"))
-miRNANames=miRTarbase_hsa_6$miRNA
+load(url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/miRTarbase_hsa_7.rda"))
+miRNANames=miRTarbase_hsa_7$miRNA
 version=checkMiRNAVersion(miRNANames)
 ##version="miRBase v21"
 Accessions=miRNA_NameToAccession(miRNANames,version = version)
-miRTarbase_hsa_6=cbind(Accessions,miRTarbase_hsa_6)
+miRTarbase_hsa_7=cbind(Accessions,miRTarbase_hsa_7)
 
 ## 2. Processing for miRecords 4 
 load(url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/miRecords_v4.rda"))
@@ -44,7 +44,7 @@ version=checkMiRNAVersion(miRNANames)
 miRNANames=miRNA_PrecursorToMature(miRNANames,version="v21")
 ## Retrieve the miRNA accessions for Mature1( tails with "5p")
 miRNANames=miRNANames$Mature1
-Accessions=miRNA_NameToAccession(miRNANames)
+Accessions=miRNA_NameToAccession(miRNANames,version="v21")
 transmir_hsa_v1_2=cbind(Accessions,transmir_hsa_v1_2)
 ## remove the missing mature miRNA
 index=which(is.na(transmir_hsa_v1_2$Accession))
@@ -117,13 +117,14 @@ index=which(is.na(ENCODE_TF_mRNA$TF_ENTREZID))
 ENCODE_TF_mRNA=ENCODE_TF_mRNA[-index,]
 
 
-## 5. Constructing miRNA-TF-mRNA network based on the interaction databases
+##Case study 1. Constructing miRNA-TF-mRNA network based on the interaction databases
 
 ####Extract all the regulation relationships from each of the interaction databases
-interaction1=cbind("regulatorID"=miRTarbase_hsa_6$Accession,
-                   "regulatorSymbol"=miRTarbase_hsa_6$miRNAName_v21,
-                   "targetID"=miRTarbase_hsa_6$`Target Gene (Entrez Gene ID)`,
-                   "targetSymbol"=miRTarbase_hsa_6$`Target Gene`)
+########miRTarbase_hsa_7
+interaction1=cbind("regulatorID"=miRTarbase_hsa_7$Accession,
+                   "regulatorSymbol"=miRTarbase_hsa_7$miRNAName_v21,
+                   "targetID"=miRTarbase_hsa_7$`Target Gene (Entrez Gene ID)`,
+                   "targetSymbol"=miRTarbase_hsa_7$`Target Gene`)
 ########miRecords_hsa_v4
 interaction2=cbind("regulatorID"=miRecords_hsa_v4$Accession,
                    "regulatorSymbol"=miRecords_hsa_v4$miRNAName_v21,
@@ -139,7 +140,7 @@ interaction3=cbind("regulatorID"=transmir_hsa_v1_2$entrezid,
 ########ENCODE_TF_miRNA
 interaction4=cbind("regulatorID"=ENCODE_TF_miRNA$ENTREZID,
                    "regulatorSymbol"=ENCODE_TF_miRNA$SYMBOL,
-                   "target"=ENCODE_TF_miRNA$Accession,
+                   "targetID"=ENCODE_TF_miRNA$Accession,
                    "targetSymbol"=ENCODE_TF_miRNA$miRNAName_v21)
 ########TRED
 interaction5=cbind("regulatorID"=TRED$TF_ENTREZID,
@@ -152,8 +153,7 @@ interaction6=cbind("regulatorID"=ENCODE_TF_mRNA$TF_ENTREZID,
                    "targetID"=ENCODE_TF_mRNA$targetGene_ENTREZID,
                    "targetSymbol"=ENCODE_TF_mRNA$targetGene_Symbol)
 
-####Combine all the regulation relationships to construct a comprehensive 
-####miRNA-TF-mRNA network 
+####Combine all the regulation relationships to construct a comprehensive miRNA-TF-mRNA network 
 network=rbind(interaction1,interaction2,interaction3,interaction4,interaction5,interaction6)
 network=unique(network)
 ## Write the network in Data table(one to one) format
@@ -174,7 +174,7 @@ sum(network_matrix)
 save(network_matrix,all_molecules,file="network_matrix.rda")
 
 
-#Scenario 2: Predicting miRNA Targets by Integrating Different Data Sources
+#Case study 2: Predicting miRNA Targets by Integrating Different Data Sources
 
 ##Convert the miRNA names for TCGA BRCA miRNA expression dataset
 load(url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/BRCA200.rda"))
@@ -198,24 +198,24 @@ BRCA=cbind(BRCA_miRNA,BRCA_mRNA)
 write.csv(BRCA,file = "BRCA_412miR_8000mR.csv", row.names = FALSE)
 
 
-## Process the miRNA Annotations of TargetScan7.0 and miRTabase 6
+## Process the miRNA Annotations of TargetScan7.0 and miRTabase 7
 TargetScan_7=read.csv(
   url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/TargetScan_7.0.csv"),
                       as.is =TRUE)
 miRNANames=TargetScan_7$mir
 version=checkMiRNAVersion(miRNANames)  ##miRBase version 17
-####convert the miRNA names to the latest miRBase version 21
+####convert the miRNA names to the miRBase version 21
 miRNANames=miRNAVersionConvert(miRNANames,targetVersion = "v21")
 TargetScan_7$mir=miRNANames$TargetName
 index=which(is.na(TargetScan_7$mir))
 TargetScan_7=TargetScan_7[-index,]
 write.csv(TargetScan_7,file = "TargetScan7_miRv21.csv", row.names = FALSE)
 
-####Extract the interactions from miRTarbase_6
+####Extract the interactions from miRTarbase_7
 load(
-  url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/miRTarbase_hsa_6.rda"))
-miRTarbase6=miRTarbase_hsa_6[,c(2,4)]
-write.csv(miRTarbase6,file = "miRTarbase6.csv", row.names = FALSE)
+  url("https://taoshengxu.github.io/ExperimentData/miRBaseConverter/miRTarbase_hsa_7.rda"))
+miRTarbase7=miRTarbase_hsa_7[,c(2,4)]
+write.csv(miRTarbase7,file = "miRTarbase7.csv", row.names = FALSE)
 
 ####Predict miRNA Targets
 library("miRLAB")
@@ -224,10 +224,10 @@ Pridict_targets=Pearson("./BRCA_412miR_8000mR.csv", c(1:412), c(413:8412)
 #Extract the hsa-miR-224-5p as the example
 miRTop100=bRank(Pridict_targets, 151,100, TRUE)
 
-####Validate the prediction using miRTarBase 6.0
-miRTop100Confirmed = Validation(miRTop100, "miRTarbase6.csv")
+####Validate the prediction using miRTarBase 7.0
+miRTop100Confirmed = Validation(miRTop100, "miRTarbase7.csv")
 miRTop100Confirmed=miRTop100Confirmed[[1]]
-#### 8 predicted miRNA-mRNAs interactions are confirmed in miRTarbase 6.0.
+#### 8 predicted miRNA-mRNAs interactions are confirmed in miRTarbase 7.0.
 ## miRNA mRNA Correlation
 ## hsa-miR-224-5p BCL2 -0.45568915
 ## hsa-miR-224-5p FOSB -0.18087381
@@ -240,10 +240,10 @@ miRTop100Confirmed=miRTop100Confirmed[[1]]
 
 ####Report the sequence of the miRNA of interest
 #Query the sequence of hsa-miR-224-5p and hsa-miR-224-3p
-Accessions=miRNA_NameToAccession(c("hsa-miR-224-5p","hsa-miR-224-3p"),version = "v21")
-getMiRNASequence(Accessions$Accession, targetVersion = "v21")
-##   Accession      miRNASequence_v21
-## 1 MIMAT0000281   CAAGUCACUAGUGGUUCCGUU
+Accessions=miRNA_NameToAccession(c("hsa-miR-224-5p","hsa-miR-224-3p"),version = "v22")
+getMiRNASequence(Accessions$Accession, targetVersion = "v22")
+##      Accession         miRNASequence_v22
+## 1 MIMAT0000281 UCAAGUCACUAGUGGUUCCGUUUAG
 ## 2 MIMAT0009198   AAAAUGGUGCCCUAGUGACUACA
 
 
